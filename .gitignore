@@ -1,0 +1,5 @@
+site/books.json
+site/reports.json
+site/reports/
+__pycache__/
+.DS_Store

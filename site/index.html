@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Sổ đọc sách</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF7F0; --ink:#2A2521; --muted:#6F665C; --rule:#D8CFBF; --accent:#8C3A2B; --tint:#F1EADD;
+  --serif:"Literata",Georgia,"Times New Roman",serif;
+  --sans:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#1E1B18; --ink:#EDE6DA; --muted:#A89E90; --rule:#3E3831; --accent:#D98C7A; --tint:#2A2622;}
+}
+*,*::before,*::after{box-sizing:inherit}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 var(--serif);-webkit-text-size-adjust:100%}
+.wrap{max-width:46rem;margin:0 auto;padding:0 1.25rem 4rem}
+
+header{padding:2.5rem 0 0}
+h1{font-weight:600;font-size:2.25rem;line-height:1.15;margin:0;letter-spacing:-.01em}
+.sub{font:400 .9rem/1.5 var(--sans);color:var(--muted);margin:.4rem 0 1.25rem}
+.double{border:0;border-top:3px double var(--accent);margin:0}
+
+nav{display:flex;gap:1.5rem;margin:1rem 0 2rem;font:500 .95rem var(--sans)}
+nav button{all:unset;cursor:pointer;padding:.25rem 0;color:var(--muted);border-bottom:2px solid transparent}
+nav button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+nav button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* Báo cáo: mỗi năm một lịch 12 tháng */
+.year{margin-bottom:2.5rem}
+.year h2{font-weight:400;font-style:italic;font-size:1.5rem;margin:0 0 .75rem;color:var(--accent)}
+.months{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
+.m{aspect-ratio:1/1.1;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:.5rem;
+   display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;color:var(--rule);font:500 .8rem var(--sans)}
+.m b{font:600 1.6rem/1 var(--serif)}
+a.m{color:var(--ink);background:var(--tint)}
+a.m b{color:var(--accent)}
+a.m:hover{background:var(--accent);color:var(--paper)}
+a.m:hover b{color:var(--paper)}
+@media (max-width:520px){.months{grid-template-columns:repeat(4,1fr)}}
+
+/* Danh mục */
+.tools{display:grid;grid-template-columns:1fr;gap:.6rem;margin-bottom:1rem}
+.filters{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
+@media (max-width:600px){.filters{grid-template-columns:1fr 1fr}}
+input,select{width:100%;font:400 .95rem var(--sans);color:var(--ink);background:var(--paper);
+  border:1px solid var(--rule);border-radius:3px;padding:.55rem .65rem}
+input{font-size:1rem}
+.count{font:400 .85rem var(--sans);color:var(--muted);margin:0 0 1.5rem}
+.group h3{font:600 1.1rem var(--serif);margin:2rem 0 .25rem;padding-bottom:.35rem;border-bottom:1px solid var(--rule);
+  display:flex;justify-content:space-between;align-items:baseline}
+.group h3 span{font:400 .8rem var(--sans);color:var(--muted)}
+ol.books{list-style:none;margin:0;padding:0}
+.bk{padding:.8rem 0;border-bottom:1px solid var(--rule)}
+.bk .t{font-weight:600;line-height:1.35}
+.bk .a{font-style:italic;color:var(--muted)}
+.bk .meta{font:400 .8rem/1.5 var(--sans);color:var(--muted);margin-top:.2rem;display:flex;flex-wrap:wrap;gap:0 1rem}
+.stars{color:var(--accent);letter-spacing:.05em}
+.empty{font-style:italic;color:var(--muted);padding:2rem 0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Sổ đọc sách</h1>
+    <p class="sub" id="sub">Báo cáo hằng tháng và những cuốn đã đọc</p>
+    <hr class="double">
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" id="tab-reports" aria-selected="true" aria-controls="reports">Báo cáo tháng</button>
+    <button role="tab" id="tab-books" aria-selected="false" aria-controls="books">Sách đã đọc</button>
+  </nav>
+
+  <section id="reports" role="tabpanel" aria-labelledby="tab-reports"></section>
+
+  <section id="books" role="tabpanel" aria-labelledby="tab-books" hidden>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Tìm tên sách hoặc tác giả" autocomplete="off">
+      <div class="filters">
+        <select id="f-year" aria-label="Năm đọc"><option value="">Mọi năm đọc</option></select>
+        <select id="f-topic" aria-label="Chủ đề"><option value="">Mọi chủ đề</option></select>
+        <select id="f-era" aria-label="Thời đại"><option value="">Mọi thời đại</option></select>
+        <select id="f-rating" aria-label="Điểm">
+          <option value="">Mọi mức điểm</option>
+          <option value="5">5 sao</option><option value="4">4 sao</option><option value="3">3 sao trở xuống</option>
+        </select>
+      </div>
+    </div>
+    <p class="count" id="count"></p>
+    <div id="list"></div>
+  </section>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const MONTHS = Array(12).fill("");
+const ERAS = ["Trước 1800","1800–1899","1900–1979","1980–2009","2010 trở đi"];
+let BOOKS = [];
+
+// Tabs, nhớ tab cuối cùng trên từng thiết bị
+function show(which){
+  for (const id of ["reports","books"]){
+    $("#"+id).hidden = id !== which;
+    $("#tab-"+id).setAttribute("aria-selected", id === which);
+  }
+  try{ localStorage.setItem("tab", which) }catch(e){}
+  if (location.hash !== "#"+which) history.replaceState(null, "", "#"+which);
+}
+$("#tab-reports").onclick = () => show("reports");
+$("#tab-books").onclick = () => show("books");
+
+function renderReports(reports){
+  const el = $("#reports");
+  if (!reports.length){ el.innerHTML = '<p class="empty">Chưa có báo cáo nào. Thêm file YYYY-MM.pdf vào thư mục reports rồi push lên.</p>'; return; }
+  const byYear = {};
+  for (const r of reports) (byYear[r.year] ??= {})[r.month] = r.file;
+  el.innerHTML = Object.keys(byYear).sort((a,b)=>b-a).map(y => `
+    <div class="year"><h2>${y}</h2><div class="months">${
+      MONTHS.map((m,i) => {
+        const f = byYear[y][i+1];
+        return f ? `<a class="m" href="${esc(f)}" target="_blank" rel="noopener" aria-label="Báo cáo tháng ${i+1}/${y}"><span>Xem báo cáo</span><b>${i+1}</b></a>`
+                 : `<span class="m" aria-hidden="true"><span></span><b>${i+1}</b></span>`;
+      }).join("")
+    }</div></div>`).join("");
+}
+
+function fill(sel, values){
+  for (const v of values){ const o = document.createElement("option"); o.value = o.textContent = v; sel.append(o); }
+}
+
+function renderBooks(){
+  const q = $("#q").value.trim().toLowerCase().normalize("NFC");
+  const fy = $("#f-year").value, ft = $("#f-topic").value, fe = $("#f-era").value, fr = $("#f-rating").value;
+  const rows = BOOKS.filter(b =>
+    (!q || (b.title + " " + b.author).toLowerCase().normalize("NFC").includes(q)) &&
+    (!fy || b.date.startsWith(fy)) && (!ft || b.topic === ft) && (!fe || b.era === fe) &&
+    (!fr || (fr === "3" ? (b.rating && b.rating <= 3) : b.rating == fr)));
+  const pages = rows.reduce((s,b) => s + (b.pages || 0), 0);
+  $("#count").textContent = `${rows.length} cuốn` + (pages ? `, khoảng ${pages.toLocaleString("vi-VN")} trang` : "");
+  if (!rows.length){ $("#list").innerHTML = '<p class="empty">Không có cuốn nào khớp. Thử bỏ bớt bộ lọc.</p>'; return; }
+  const groups = {};
+  for (const b of rows) (groups[b.date.slice(0,4)] ??= []).push(b);
+  $("#list").innerHTML = Object.keys(groups).sort((a,b)=>b-a).map(y => `
+    <div class="group"><h3>${y}<span>${groups[y].length} cuốn</span></h3><ol class="books">${
+      groups[y].map(b => {
+        const d = b.date.split("-");
+        const meta = [
+          b.rating ? `<span class="stars" aria-label="${b.rating} sao">${"★".repeat(b.rating)}</span>` : "",
+          `<span>xong ${+d[2]}/${+d[1]}</span>`,
+          b.year ? `<span>xuất bản ${b.year}</span>` : "",
+          b.pages ? `<span>${b.pages} trang</span>` : "",
+          b.days ? `<span>${b.days} ngày</span>` : "",
+          b.topic ? `<span>${esc(b.topic)}</span>` : ""
+        ].join("");
+        return `<li class="bk"><div class="t">${esc(b.title)}</div><div class="a">${esc(b.author)}</div><div class="meta">${meta}</div></li>`;
+      }).join("")
+    }</ol></div>`).join("");
+}
+
+async function load(){
+  const get = u => fetch(u, {cache:"no-store"}).then(r => r.ok ? r.json() : []).catch(() => []);
+  const [reports, books] = await Promise.all([get("reports.json"), get("books.json")]);
+  BOOKS = books;
+  renderReports(reports);
+  fill($("#f-year"), [...new Set(books.map(b => b.date.slice(0,4)))].sort().reverse());
+  fill($("#f-topic"), [...new Set(books.map(b => b.topic).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"vi")));
+  fill($("#f-era"), ERAS.filter(e => books.some(b => b.era === e)));
+  const n = books.length;
+  if (n) $("#sub").textContent = `Báo cáo hằng tháng và ${n} cuốn đã đọc`;
+  renderBooks();
+}
+for (const id of ["#q","#f-year","#f-topic","#f-era","#f-rating"]) $(id).addEventListener("input", renderBooks);
+
+let start = location.hash.slice(1);
+if (!["reports","books"].includes(start)){ try{ start = localStorage.getItem("tab") || "reports" }catch(e){ start = "reports" } }
+show(start);
+load();
+</script>
+</body>
+</html>
